@@ -7,27 +7,27 @@ import os
 import io
 import zipfile
 import subprocess
+import streamlit as st
 from pathlib import Path
-from google.colab import files
 from IPython.display import display, HTML
 
 # Quietly install required packages
-print("Installing required packages...")
-subprocess.run(['pip', 'install', 'openpyxl', 'pypandoc', 'beautifulsoup4', '--quiet'], capture_output=True, text=True)
-subprocess.run(['apt-get', 'install', 'pandoc', '--quiet'], capture_output=True, text=True)
-print("Installation complete.")
+# The installation is now part of the Streamlit Cloud build process.
+# We'll remove it from the runtime code.
 
 def upload_file():
   """
-  Provides a file upload widget for the user in a Colab environment.
+  Provides a file upload widget for the user in a Streamlit environment.
   Returns the file path of the uploaded file.
   """
-  print("\nPlease upload your file(s) (Word, Excel, PPTX, HTML, ZIP, etc.).")
-  uploaded = files.upload()
-  if uploaded:
-    # Get the file name from the uploaded dictionary
-    file_name = list(uploaded.keys())[0]
-    return file_name
+  st.title("Universal File-to-Text Converter")
+  uploaded_file = st.file_uploader("Upload your file(s) (Word, Excel, PPTX, HTML, ZIP, etc.)", type=None)
+  if uploaded_file is not None:
+    # Save the uploaded file to a temporary location
+    file_path = uploaded_file.name
+    with open(file_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    return file_path
   else:
     return None
 
@@ -105,30 +105,27 @@ def display_and_download_output(text, file_name):
     file_name (str): The original file name used for the download link.
   """
   if not text:
-    print("No content to display or download.")
+    st.write("No content to display or download.")
     return
 
   # Display the first 1000 characters as a preview
   preview_text = text[:1000] + ('...' if len(text) > 1000 else '')
-  print("\n--- Preview (first 1000 characters) ---")
-  print(preview_text)
-  print("--- End of Preview ---")
+  st.subheader("Preview (first 1000 characters)")
+  st.code(preview_text)
 
   # Create a download link for the full text
   download_file_name = f"{Path(file_name).stem}_converted.md"
-  with open(download_file_name, 'w', encoding='utf-8') as f:
-    f.write(text)
-
-  # Use google.colab.files.download to download the file directly
-  files.download(download_file_name)
-
+  st.download_button(
+      label="Download Full Text",
+      data=text,
+      file_name=download_file_name,
+      mime="text/markdown"
+  )
 
 # --- Main execution block ---
 if __name__ == "__main__":
   uploaded_file_path = upload_file()
   if uploaded_file_path:
     converted_text, status_message = universal_file_converter(uploaded_file_path)
-    print(status_message)
+    st.write(status_message)
     display_and_download_output(converted_text, uploaded_file_path)
-  else:
-    print("No file was uploaded. Please try again.")
