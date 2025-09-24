@@ -1,7 +1,7 @@
 # @title Universal File-to-Text Converter
-# This script is designed to run in a Google Colab environment.
+# This script is designed to run in a Streamlit environment.
 # It provides functions to upload files, convert them to plain text or Markdown,
-# and then display a preview and a download link.
+# and then provides a preview and a download link.
 
 import os
 import io
@@ -130,3 +130,5 @@ if __name__ == "__main__":
   if uploaded_file_path:
     converted_text, status_message = universal_file_converter(uploaded_file_path)
     st.write(status_message)
+    display_and_download_output(converted_text, uploaded_file_path)
+
