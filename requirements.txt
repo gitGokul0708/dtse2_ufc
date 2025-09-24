@@ -1,3 +1,4 @@
 openpyxl
 pypandoc
 beautifulsoup4
+streamlit
