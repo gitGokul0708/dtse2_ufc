@@ -9,11 +9,13 @@ import zipfile
 import subprocess
 import streamlit as st
 from pathlib import Path
-from IPython.display import display, HTML
 
-# Quietly install required packages
-# The installation is now part of the Streamlit Cloud build process.
-# We'll remove it from the runtime code.
+# The following imports are removed as they are not needed in the Streamlit app.
+# from google.colab import files
+# from IPython.display import display, HTML
+
+# The subprocess calls for installation are also removed, as these are handled
+# by the requirements.txt and packages.txt files in Streamlit Cloud.
 
 def upload_file():
   """
@@ -128,4 +130,3 @@ if __name__ == "__main__":
   if uploaded_file_path:
     converted_text, status_message = universal_file_converter(uploaded_file_path)
     st.write(status_message)
-    display_and_download_output(converted_text, uploaded_file_path)
